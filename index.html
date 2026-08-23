@@ -71,7 +71,7 @@
     /* Floating Navigation Indicator Bar */
     .journey-nav {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 12px; z-index: 100;
+      display: flex; gap: 10px; z-index: 100;
       background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px);
       padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);
       opacity: 0; transition: opacity 1s;
@@ -229,6 +229,28 @@
     .letter-content { font-family: 'Dancing Script', cursive; font-size: 1.35rem; line-height: 1.7; color: #fff0f3; }
     .signature-tag { text-align: right; margin-top: 20px; font-family: 'Great Vibes', cursive; font-size: 2.2rem; color: #ffb6c1; }
 
+    /* =========================================================
+       PAGE 11: CUTE & DEEP GAME
+       ========================================================= */
+    .game-card {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 182, 193, 0.3);
+      padding: 25px; border-radius: 20px; max-width: 500px; width: 100%; backdrop-filter: blur(12px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5); margin-top: 10px;
+    }
+    .game-question { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #ffe4e1; margin-bottom: 20px; line-height: 1.4; }
+    .game-options { display: flex; flex-direction: column; gap: 12px; }
+    .game-opt-btn {
+      background: rgba(255, 182, 193, 0.08); border: 1px solid rgba(255, 182, 193, 0.25);
+      color: #fff; padding: 12px 20px; border-radius: 25px; cursor: pointer;
+      font-family: 'Montserrat', sans-serif; font-size: 0.85rem; transition: all 0.3s;
+      text-align: left;
+    }
+    .game-opt-btn:hover { background: rgba(255, 182, 193, 0.2); border-color: #ffb6c1; transform: translateX(5px); }
+    .game-response {
+      font-family: 'Dancing Script', cursive; font-size: 1.4rem; color: #ffb6c1;
+      line-height: 1.6; margin-top: 20px; display: none; text-align: center;
+    }
+
   </style>
 </head>
 <body>
@@ -241,7 +263,7 @@
     <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- NAVIGATION DOTS (10 PAGES) -->
+  <!-- NAVIGATION DOTS (11 PAGES) -->
   <div class="journey-nav" id="nav-bar">
     <div class="nav-dot active" onclick="jumpToScene(1)"></div>
     <div class="nav-dot" onclick="jumpToScene(2)"></div>
@@ -253,6 +275,7 @@
     <div class="nav-dot" onclick="jumpToScene(8)"></div>
     <div class="nav-dot" onclick="jumpToScene(9)"></div>
     <div class="nav-dot" onclick="jumpToScene(10)"></div>
+    <div class="nav-dot" onclick="jumpToScene(11)"></div>
   </div>
 
   <!-- =========================================================
@@ -426,7 +449,7 @@
 
       <div class="player-controls">
         <button class="btn-glow" style="margin:0; padding:8px 15px;" onclick="prevSong()">⏮</button>
-        <div class="play-btn-circle" id="play-pause-btn" onclick="togglePlay()">▶</div>
+        <div class="play-btn-circle" id="play-pause-btn" onclick="togglePlay()">⏸</div>
         <button class="btn-glow" style="margin:0; padding:8px 15px;" onclick="nextSong()">⏭</button>
       </div>
     </div>
@@ -475,7 +498,25 @@
       </div>
       <div class="signature-tag">Forever Yours,<br>Satyam ❤️</div>
     </div>
-    <button class="btn-glow" onclick="jumpToScene(1)">Replay Our Journey 🔄</button>
+    <button class="btn-glow" onclick="jumpToScene(11)">Play Our Cute Game 🎮👉</button>
+  </section>
+
+  <!-- =========================================================
+       PAGE 11: CUTE & DEEP GAME
+       ========================================================= -->
+  <section class="scene-view" id="ch-11">
+    <div class="step-indicator">PAGE 11 • OUR LITTLE GAME</div>
+    <h1 class="title-cinematic">LOVE QUIZ FOR GIMMU</h1>
+    <p class="subtitle-cute">Answer these tiny questions from your heart... 💖</p>
+
+    <div class="game-card">
+      <div id="game-step-box">
+        <!-- Questions injected dynamically -->
+      </div>
+      <div class="game-response" id="game-response-text"></div>
+    </div>
+
+    <button class="btn-glow" id="replay-btn" style="display:none;" onclick="jumpToScene(1)">Replay Our Whole Journey 🔄</button>
   </section>
 
   <!-- =========================================================
@@ -483,7 +524,7 @@
        ========================================================= -->
   <script>
     // 1. CONFIGURATION
-    const CORRECT_PASS = "10122009"; // Passcode
+    const CORRECT_PASS = "10122009";
 
     // 2. STARRY BACKGROUND CANVAS
     const canvas = document.getElementById('star-canvas');
@@ -523,13 +564,21 @@
 
     // 3. UNLOCK APP
     const toneAudio = document.getElementById('bg-lovely-tone');
+    const bAudio = document.getElementById('bollywood-audio');
+    let isPlaying = false;
     
     function unlockApp() {
       const input = document.getElementById('pass-code').value;
       const err = document.getElementById('err-text');
       if (input === CORRECT_PASS) {
         err.style.display = 'none';
+        
         toneAudio.play().catch(e => console.log("Audio waiting"));
+        bAudio.play().then(() => {
+          isPlaying = true;
+          document.getElementById('play-pause-btn').innerText = '⏸';
+        }).catch(e => console.log("Audio waiting"));
+
         document.getElementById('nav-bar').style.opacity = '1';
         jumpToScene(2);
       } else {
@@ -537,7 +586,7 @@
       }
     }
 
-    // 4. SCENE SWITCHING LOGIC (10 DEDICATED PAGES)
+    // 4. SCENE SWITCHING LOGIC
     function jumpToScene(idx) {
       document.querySelectorAll('.scene-view').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-dot').forEach((d, i) => {
@@ -549,6 +598,7 @@
       if (next) {
         next.classList.add('active');
         if (idx === 2) setTimeout(drawMapLine, 300);
+        if (idx === 11) initGame();
       }
     }
 
@@ -570,7 +620,7 @@
       const y2 = (rB.top + rB.height / 2) - container.top;
 
       const midX = (x1 + x2) / 2;
-      const midY = Math.min(y1, y2) - 40; // Arc Height
+      const midY = Math.min(y1, y2) - 40;
 
       line.setAttribute('d', `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`);
     }
@@ -598,8 +648,6 @@
       { name: "Tum Se Hi", artist: "Mohit Chauhan • Jab We Met", src: "https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" }
     ];
     let trackIdx = 0;
-    const bAudio = document.getElementById('bollywood-audio');
-    let isPlaying = false;
 
     function togglePlay() {
       const btn = document.getElementById('play-pause-btn');
@@ -607,7 +655,6 @@
         bAudio.pause();
         btn.innerText = '▶';
       } else {
-        toneAudio.pause(); // Pause background tone when playing explicit song
         bAudio.play();
         btn.innerText = '⏸';
       }
@@ -627,6 +674,73 @@
       document.getElementById('track-name').innerText = playlist[trackIdx].name;
       document.getElementById('track-artist').innerText = playlist[trackIdx].artist;
       if (isPlaying) bAudio.play();
+    }
+
+    // 8. CUTE & DEEP GAME LOGIC
+    const gameQuestions = [
+      {
+        q: "Jab humara distance khatam hoga, sabse pehle aap kya karengi?",
+        opts: [
+          { text: "Bohut tight waala Hug aur Kissii 🫂❤️", reply: "Mujhe pata tha! Mein bhi aapko itna tight hug karunga ki saare distance ki thakan ghaayab ho jayegi hehe..." },
+          { text: "Mera haath pakad ke chup-chap baithna 🤝✨", reply: "Woh pal duniya ka sabse peaceful pal hoga baby mere liye toh..." },
+          { text: "Aapko bohut pareshaan aur teasing karungi 😜", reply: "Hehe kariyega jitna pareshaan karna hai, aapke har nakhra sar aankhon par utahunga!" }
+        ]
+      },
+      {
+        q: "Jab mein gussa hu ya sad hu aapse nhi kisi se bhi tab?, Gimmu kaise manayegi?",
+        opts: [
+          { text: "Pyaari si smile karke bolungi 'I Love You' 🥺", reply: "Mera gussa ek second mein pighal jayega mera bachha..." },
+          { text: "Pyaari pyaari baatein karke hassayungi 😄", reply: "Aapki aawaaz sunte hi mere saare stress door ho jaate h..." },
+          { text: "Godi mein litakar forehead kiss dungi 🌸", reply: "Awwwwwww bhaiiiii ye mil gaya toh mein toh kabhi zindagi stress nhi lunga ..." }
+        ]
+      },
+      {
+        q: "Humare is rishte mein aapko sabse pyaari cheez kya lagti hai?",
+        opts: [
+          { text: "itna distance hone par bhi itna pyaar ❤️", reply: "Distance kitna bhi ho, mera dil hamesha Deoghar mein aapke paas rehta hai..." },
+          { text: "aapke laakh bolne pr bhi aapka saath na chhodna ✨", reply: "Hamesha har kadam par aapke saath rahunga meraaa bachha!" },
+          { text: "Humari pyaar bhari baatein❤️ ", reply: "bs woh ho jaati haii toh hum dono ka din bn jata haiiii." }
+        ]
+      }
+    ];
+
+    let currentGameIdx = 0;
+
+    function initGame() {
+      currentGameIdx = 0;
+      document.getElementById('replay-btn').style.display = 'none';
+      renderGameStep();
+    }
+
+    function renderGameStep() {
+      const box = document.getElementById('game-step-box');
+      const respBox = document.getElementById('game-response-text');
+      respBox.style.display = 'none';
+
+      if (currentGameIdx < gameQuestions.length) {
+        const item = gameQuestions[currentGameIdx];
+        let html = `<div class="game-question">${item.q}</div><div class="game-options">`;
+        item.opts.forEach((opt, idx) => {
+          html += `<button class="game-opt-btn" onclick="selectGameOpt(${idx})">${opt.text}</button>`;
+        });
+        html += `</div>`;
+        box.innerHTML = html;
+      } else {
+        box.innerHTML = `<div class="game-question">Game Complete! 🎉<br><br>meriii baby, aap mere liye duniya ki sabse special aur sabse pyaari ladki h merii haiii. Infinity and Beyond! ❤️</div>`;
+        document.getElementById('replay-btn').style.display = 'inline-block';
+      }
+    }
+
+    function selectGameOpt(optIdx) {
+      const item = gameQuestions[currentGameIdx];
+      const respBox = document.getElementById('game-response-text');
+      respBox.innerText = item.opts[optIdx].reply;
+      respBox.style.display = 'block';
+
+      setTimeout(() => {
+        currentGameIdx++;
+        renderGameStep();
+      }, 3500);
     }
   </script>
 </body>
